@@ -19,11 +19,13 @@ const resultsList = document.querySelector(".results__list");
 const detailsContainer = document.querySelector(".detail");
 const searchCount = document.querySelector(".search__count");
 
+
 // CHANGED: was ".field__input", which is on TWO inputs (search and max
 // rent). It worked only because the search box comes first in the HTML.
 // Move the inputs around and it would silently break.
 const fieldInput = document.querySelector("#search-input");
 const searchForm = document.querySelector("#search-form");
+const maxRentInput = document.querySelector("#max-rent");
 
 /* ---------------------------------------------------------------
    STATE
@@ -278,19 +280,27 @@ detailsContainer.addEventListener("input", (event) => {
   }
 });
 
-fieldInput.addEventListener("input", (e) => {
-  const searchValue = e.target.value.toLowerCase().trim();
+const filterListings = () => {
+  const searchValue = fieldInput.value.toLowerCase().trim();
+  const maxRentValue = maxRentInput.value;
 
-  if (searchValue === "") {
-    newListings = listings;
-  } else {
-    newListings = listings.filter((listing) =>
-      listing.name.toLowerCase().includes(searchValue),
-    );
-  }
+  newListings = listings.filter((listing) => {
+    const matchesSearch =
+      searchValue === "" ||
+      listing.name.toLowerCase().includes(searchValue);
+
+    const matchesRent =
+      maxRentValue === "" ||
+      listing.monthlyRent <= Number(maxRentValue);
+
+    return matchesSearch && matchesRent;
+  });
 
   results();
-});
+};
+
+fieldInput.addEventListener("input", filterListings);
+maxRentInput.addEventListener("input", filterListings);
 
 searchForm.addEventListener("submit", (e) => {
   e.preventDefault();
